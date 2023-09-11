@@ -3,6 +3,9 @@ import { hash as blake3wasm } from "@timsuchanek/blake3-wasm"
 import { blake3 as noble } from '@noble/hashes/blake3'
 import { createReadStream, readFileSync, readdirSync } from 'node:fs'
 import { createHash } from 'node:crypto'
+import { instantiate } from './deno_std_wasm_crypto.generated.mjs'
+
+const deno = instantiate()
 
 const directory = readdirSync('./sample-files')
 const bench = new Bench({ warmupIterations: 100, iterations: 1000 })
@@ -41,6 +44,11 @@ bench.add('web crypto SHA-384', async function() {
 bench.add('web crypto SHA-512', async function() {
 	const fileContents = readFileSync('./sample-files/' + pickRandomlyFrom(directory))
 	await crypto.subtle.digest('SHA-512', fileContents)
+})
+
+bench.add('deno-std BLAKE3', async function() {
+	const fileContents = readFileSync('./sample-files/' + pickRandomlyFrom(directory))
+	const x = deno.digest('BLAKE3', fileContents)
 })
 
 bench.add('blake3-wasm', async function() {
