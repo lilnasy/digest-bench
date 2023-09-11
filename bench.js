@@ -11,7 +11,7 @@ const directory = readdirSync('./sample-files')
 const bench = new Bench({ warmupIterations: 100, iterations: 1000 })
 
 bench.add('just reading from disk', async function() {
-	const fileContents = await fs.readFile('./sample-files/' + pickRandomlyFrom(directory))
+	const fileContents = readFileSync('./sample-files/' + pickRandomlyFrom(directory))
 	await Function.prototype(fileContents)
 })
 
