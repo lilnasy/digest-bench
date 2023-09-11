@@ -8,7 +8,7 @@ import { instantiate } from './deno_std_wasm_crypto.generated.mjs'
 const deno = instantiate()
 
 const directory = readdirSync('./sample-files')
-const bench = new Bench({ warmupIterations: 100, iterations: 1000 })
+const bench = new Bench({ warmupIterations: 1000, iterations: 10000, warmupTime: 0, time: 0 })
 
 bench.add('just reading from disk', async function() {
 	const fileContents = readFileSync('./sample-files/' + pickRandomlyFrom(directory))
@@ -48,7 +48,7 @@ bench.add('web crypto SHA-512', async function() {
 
 bench.add('deno-std BLAKE3', async function() {
 	const fileContents = readFileSync('./sample-files/' + pickRandomlyFrom(directory))
-	const x = deno.digest('BLAKE3', fileContents)
+	deno.digest('BLAKE3', fileContents)
 })
 
 bench.add('blake3-wasm', async function() {
@@ -64,7 +64,7 @@ bench.add('@noble/hashes BLAKE3', async function() {
 
 await bench.run()
 
-console.table(bench.table())
+console.table(bench.table().sort((a,b) => Number(b['ops/sec'].replace(',','')) - Number(a['ops/sec'].replace(',',''))))
 
 
 /***** UTILITY FUNCTIONS *****/
